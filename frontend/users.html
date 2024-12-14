@@ -1,0 +1,50 @@
+!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Utilizadores</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<h1>Gestão de Utilizadores</h1>
+<form id="createUserForm">
+<label for="name">Nome:</label>
+<input type="text" id="name" name="name" required>
+ 
+        <label for="email">Email:</label>
+<input type="email" id="email" name="email" required>
+ 
+        <label for="nif">NIF:</label>
+<input type="text" id="nif" name="nif" required>
+ 
+        <label for="birth_date">Data de Nascimento:</label>
+<input type="date" id="birth_date" name="birth_date" required>
+ 
+        <label for="address">Morada:</label>
+<input type="text" id="address" name="address" required>
+ 
+        <label for="phone">Telefone:</label>
+<input type="text" id="phone" name="phone" required>
+ 
+        <button type="submit">Criar Utilizador</button>
+</form>
+ 
+    <h2>Lista de Utilizadores</h2>
+<table id="usersTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>Nome</th>
+<th>Email</th>
+<th>NIF</th>
+</tr>
+</thead>
+<tbody>
+<!-- Dados serão carregados dinamicamente -->
+</tbody>
+</table>
+ 
+    <script src="assets/js/scripts.js"></script>
+</body>
+</html>

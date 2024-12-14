@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Transações</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<h1>Gestão de Transações</h1>
+<form id="transferFundsForm">
+<label for="from_account">Conta de Origem:</label>
+<input type="number" id="from_account" name="from_account" required>
+ 
+        <label for="to_account">Conta de Destino:</label>
+<input type="number" id="to_account" name="to_account" required>
+ 
+        <label for="amount">Montante:</label>
+<input type="number" id="amount" name="amount" required>
+ 
+        <button type="submit">Transferir Fundos</button>
+</form>
+ 
+    <h2>Histórico de Transações</h2>
+<table id="transactionsTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>De</th>
+<th>Para</th>
+<th>Montante</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+<!-- Dados serão carregados dinamicamente -->
+</tbody>
+</table>
+ 
+    <script src="assets/js/scripts.js"></script>
+</body>
+</html>

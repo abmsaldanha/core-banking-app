@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Contas</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<h1>Gestão de Contas</h1>
+<form id="createAccountForm">
+<label for="user_id">ID do Utilizador:</label>
+<input type="number" id="user_id" name="user_id" required>
+ 
+        <label for="initial_balance">Saldo Inicial:</label>
+<input type="number" id="initial_balance" name="initial_balance" required>
+ 
+        <button type="submit">Criar Conta</button>
+</form>
+ 
+    <h2>Lista de Contas</h2>
+<table id="accountsTable">
+<thead>
+<tr>
+<th>ID da Conta</th>
+<th>ID do Utilizador</th>
+<th>Saldo</th>
+</tr>
+</thead>
+<tbody>
+<!-- Dados serão carregados dinamicamente -->
+</tbody>
+</table>
+ 
+    <script src="assets/js/scripts.js"></script>
+</body>
+</html>
