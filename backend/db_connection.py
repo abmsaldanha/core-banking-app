@@ -2,6 +2,7 @@ import pymysql
 
 
 def connect_to_database():
+    print("Entra aqui")
     try:
         connection = pymysql.connect(
         host='127.0.0.1',
