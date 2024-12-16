@@ -3,16 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>NatiBank - Dashboard</title>
 <link rel="stylesheet" href="assets/css/styles.css">
+<style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar {
+            background-color: #6a0dad;
+            color: white;
+            width: 250px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        .sidebar h2 {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .balance {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        .carousel {
+            width: 80%;
+            max-width: 800px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        .carousel img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.5s ease-in-out;
+        }
+</style>
 </head>
 <body>
-<header>Dashboard - Aplicação Bancária</header>
-<div class="container">
-<h2>Bem-vindo à aplicação bancária!</h2>
-<a class="button" href="users.html">Gestão de Utilizadores</a>
-<a class="button" href="accounts.html">Gestão de Contas</a>
-<a class="button" href="transactions.html">Gestão de Transações</a>
+<div class="sidebar">
+<img src="assets/images/profile-placeholder.png" alt="Foto de Perfil">
+<h2 id="username">Nome do Utilizador</h2>
+<a href="accounts.html">Gestão de Contas</a>
+<a href="transactions.html">Gestão de Transações</a>
 </div>
+<div class="main-content">
+<div class="balance">Saldo Atual: € 0.00</div>
+<div class="carousel">
+<img src="assets/images/advertisement1.png" alt="Publicidade 1">
+<!-- Adicione mais imagens de publicidade no futuro -->
+</div>
+</div>
+<script>
+        // Carregar o nome do utilizador
+        //document.getElementById("username").innerText = localStorage.getItem("username") || "Nome do Utilizador";
+ 
+        // Lógica para o carrossel (simples)
+        const carousel = document.querySelector(".carousel");
+        const images = carousel.querySelectorAll("img");
+        let index = 0;
+ 
+        setInterval(() => {
+            images[index].style.transform = "translateX(-100%)";
+            index = (index + 1) % images.length;
+            images[index].style.transform = "translateX(0)";
+        }, 3000); // Troca de imagens a cada 3 segundos
+</script>
 </body>
 </html>

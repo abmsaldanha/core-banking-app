@@ -3,19 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
+<title>NatiBank - Login</title>
 <link rel="stylesheet" href="assets/css/styles.css">
+<style>
+        body {
+            background-image: url('assets/images/bank-background.webp'); /* Caminho da imagem */
+            background-size: cover; /* A imagem cobre todo o fundo */
+            background-position: center; /* Centraliza a imagem */
+            background-repeat: no-repeat; /* Evita a repetição da imagem */
+            height: 100vh; /* Faz o fundo ocupar toda a altura da página */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo semi-transparente */
+            padding: 3rem; /* Maior espaço interno */
+            border-radius: 12px; /* Cantos arredondados */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada */
+            text-align: center;
+            max-width: 600px; /* Aumenta a largura */
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column; /* Organiza as caixas em coluna */
+            gap: 1rem; /* Espaçamento entre os campos */
+        }
+        .form-control label {
+            text-align: left;
+            font-weight: bold;
+            color: #444;
+            display: block;
+        }
+        .form-control input {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 2.5rem;
+            padding: 2.0rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color:#6a0dad; /* Cor roxa */
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4b0082; /* Roxo mais escuro ao passar o rato */
+        }
+        .register-link {
+            margin-top: 2.5rem; /* Maior espaço abaixo do botão */
+            font-size: 1rem;
+            color: #6a0dad; /* Cor roxa */
+            text-decoration: none;
+        }
+        .register-link:hover {
+            text-decoration: underline;
+            color: #4b0082; /* Roxo mais escuro ao passar o rato */
+        }
+</style>
 </head>
 <body>
-<header>Login - Aplicação Bancária</header>
 <div class="container">
+<h1>NatiBank</h1>
 <form id="loginForm">
-<label for="email">Email:</label>
-<input type="text" id="email" name="email" required>
-<label for="password">Password:</label>
+<div class="form-control">
+<label for="email">Email</label>
+<input type="email" id="email" name="email" required>
+</div>
+<div class="form-control">
+<label for="password">Password</label>
 <input type="password" id="password" name="password" required>
-<button type="submit">Entrar</button>
+</div>
+<button type="submit" style="margin-bottom: 2rem; margin-top: 1rem; align-self:center; padding: 0.8rem; font-size: 1.2rem; font-weight: bold; background-color: #6a0dad; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    Entrar
+</button>
 </form>
+<a href="users.html" class="register-link">Ainda não tem conta? Registe-se!</a>
 <p id="errorMessage" style="color: red; display: none;">Erro ao fazer login. Verifique os dados.</p>
 </div>
 <script src="assets/js/login.js"></script>
