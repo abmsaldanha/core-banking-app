@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NatiBank - Movimentos</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+<style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+ 
+        .sidebar {
+            background-color: #6a0dad;
+            color: white;
+            width: 250px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+ 
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+        }
+ 
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+ 
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+ 
+        table th, table td {
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+ 
+        table th {
+            background-color: #6a0dad;
+            color: white;
+        }
+ 
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+</style>
+</head>
+<body>
+<div class="sidebar">
+<a href="dashboard.html">Menu</a>
+<a href="transactions.html">Transferências</a>
+<a href="deposits.html">Depósitos</a>
+<a href="movements.html">Movimentos</a>
+</div>
+<div class="main-content">
+<h1>Histórico de Movimentos</h1>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>IBAN de Destino</th>
+<th>Montante (€)</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody id="transactionsTable">
+<!-- Dados carregados dinamicamente -->
+</tbody>
+</table>
+</div>
+<script>
+        async function loadTransactions() {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/transactions", {
+                    method: "GET",
+                    credentials: "include"
+                });
+ 
+                if (response.ok) {
+                    const transactions = await response.json();
+                    const tableBody = document.getElementById("transactionsTable");
+                    tableBody.innerHTML = "";
+ 
+                    transactions.forEach(transaction => {
+                        const row = `
+<tr>
+<td>${transaction.transaction_id}</td>
+<td>${transaction.to_iban}</td>
+<td>€ ${transaction.amount}</td>
+<td>${transaction.transaction_date}</td>
+</tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    console.error("Erro ao carregar movimentos.");
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+            }
+        }
+ 
+        document.addEventListener("DOMContentLoaded", loadTransactions);
+</script>
+</body>
+</html>

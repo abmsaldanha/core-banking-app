@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NatiBank - Transferências</title>
+<title>Depósitos - NatiBank</title>
 <link rel="stylesheet" href="assets/css/styles.css">
 <style>
         body {
@@ -85,47 +85,44 @@
 <img src="assets/images/profile-placeholder.png" alt="Foto de Perfil">
 <a href="dashboard.html">Menu</a>
 <a href="transactions.html">Transferências</a>
-<a href="deposits.html">Depósitos</a>
-<a href="movements.html">Movimentos</a> <!-- Nova página adicionada -->
+<a href="deposits.html">Depósitos</a> <!-- Nova página -->
+<a href="movements.html">Movimentos</a>
 </div>
 <div class="main-content">
-<h1>Transferências</h1>
-<form id="transferFundsForm">
-<label for="to_iban">IBAN da Conta de Destino:</label>
-<input type="text" id="to_iban" name="to_iban" placeholder="Ex: PT50000201234567890154" required>
-<label for="amount">Montante (€):</label>
+<h1>Depósitos</h1>
+<form id="depositForm">
+<label for="amount">Montante do Depósito (€):</label>
 <input type="number" id="amount" name="amount" required>
-<button type="submit">Transferir</button>
+<button type="submit" style="margin-bottom: 2rem; margin-top: 1rem; align-self:center; padding: 0.8rem; font-size: 1.2rem; font-weight: bold; background-color: #6a0dad; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    Concluir
+</button>
 </form>
-<p id="successMessage" style="color: green; display: none;">Transferência realizada com sucesso!</p>
+<p id="successMessage" style="color: green; display: none;">Depósito realizado com sucesso!</p>
 </div>
 <script>
-        document.getElementById("transferFundsForm").addEventListener("submit", async (e) => {
+        document.getElementById("depositForm").addEventListener("submit", async (e) => {
             e.preventDefault();
  
-            const transactionData = {
-                to_iban: document.getElementById("to_iban").value,
-                amount: document.getElementById("amount").value
-            };
+            const amount = document.getElementById("amount").value;
  
             try {
-                const response = await fetch("http://127.0.0.1:5000/transactions", {
+                const response = await fetch("http://127.0.0.1:5000/deposits", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify(transactionData)
+                    credentials: "include", // Enviar o cookie da sessão
+                    body: JSON.stringify({ amount })
                 });
  
                 const result = await response.json();
  
                 if (response.ok) {
                     document.getElementById("successMessage").style.display = "block";
-                    document.getElementById("transferFundsForm").reset();
+                    document.getElementById("amount").value = "";
                 } else {
-                    alert(result.error || "Erro ao realizar transferência.");
+                    alert(result.error || "Erro ao realizar o depósito.");
                 }
             } catch (error) {
-                console.error("Erro ao realizar transferência:", error);
+                console.error("Erro:", error);
             }
         });
 </script>

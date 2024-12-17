@@ -9,6 +9,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify({ email, password }),
         });
  
@@ -22,4 +23,5 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         console.error("Erro ao fazer login:", error);
         document.getElementById("errorMessage").style.display = "block";
     }
+
 });

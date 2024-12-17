@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NatiBank - Dashboard</title>
+<title>NatiBank - Menu</title>
 <link rel="stylesheet" href="assets/css/styles.css">
 <style>
         body {
@@ -11,7 +11,12 @@
             display: flex;
             height: 100vh;
             font-family: Arial, sans-serif;
+            background-image: url('assets/images/bank-background.webp'); /* Imagem de fundo */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
+ 
         .sidebar {
             background-color: #6a0dad;
             color: white;
@@ -21,16 +26,19 @@
             flex-direction: column;
             align-items: center;
         }
+ 
         .sidebar img {
             width: 100px;
             height: 100px;
             border-radius: 50%;
             margin-bottom: 1rem;
         }
+ 
         .sidebar h2 {
             margin-bottom: 2rem;
             text-align: center;
         }
+ 
         .sidebar a {
             color: white;
             text-decoration: none;
@@ -38,34 +46,46 @@
             font-size: 1.2rem;
             text-align: center;
         }
+ 
         .sidebar a:hover {
             text-decoration: underline;
         }
+ 
         .main-content {
             flex-grow: 1;
             padding: 2rem;
-            background-color: #f4f4f4;
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo semi-transparente */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
+ 
         .balance {
             font-size: 2rem;
             margin-bottom: 2rem;
             color: #333;
         }
+ 
         .carousel {
+            position: relative;
             width: 80%;
             max-width: 800px;
-            display: flex;
+            height: 300px;
             overflow: hidden;
-            position: relative;
         }
+ 
         .carousel img {
             width: 100%;
-            height: auto;
-            transition: transform 0.5s ease-in-out;
+            height: 300px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+ 
+        .carousel img.active {
+            opacity: 1;
         }
 </style>
 </head>
@@ -73,30 +93,27 @@
 <div class="sidebar">
 <img src="assets/images/profile-placeholder.png" alt="Foto de Perfil">
 <h2 id="username">Nome do Utilizador</h2>
-<a href="accounts.html">Gestão de Contas</a>
-<a href="transactions.html">Gestão de Transações</a>
+<a href="deposits.html">Depósitos</a>
+<a href="transactions.html">Transferências</a>
+<a href="movements.html">Movimentos</a>
 </div>
 <div class="main-content">
-<div class="balance">Saldo Atual: € 0.00</div>
-<div class="carousel">
-<img src="assets/images/advertisement1.png" alt="Publicidade 1">
-<!-- Adicione mais imagens de publicidade no futuro -->
-</div>
-</div>
-<script>
-        // Carregar o nome do utilizador
-        //document.getElementById("username").innerText = localStorage.getItem("username") || "Nome do Utilizador";
+<div class="balance">Saldo:</div>
  
-        // Lógica para o carrossel (simples)
-        const carousel = document.querySelector(".carousel");
-        const images = carousel.querySelectorAll("img");
+        <div class="carousel">
+<img src="assets/images/olaaa.webp" class="active" alt="Publicidade 1">
+</div>
+</div>
+ 
+    <script>
+        const images = document.querySelectorAll('.carousel img');
         let index = 0;
  
         setInterval(() => {
-            images[index].style.transform = "translateX(-100%)";
+            images[index].classList.remove('active');
             index = (index + 1) % images.length;
-            images[index].style.transform = "translateX(0)";
-        }, 3000); // Troca de imagens a cada 3 segundos
+            images[index].classList.add('active');
+        }, 3000); // Troca de imagem a cada 3 segundos
 </script>
 </body>
 </html>

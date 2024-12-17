@@ -3,10 +3,13 @@ from functools import wraps
 from flask_cors import CORS
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
- 
+from flask_cors import cross_origin
+from datetime import timedelta
+
 app = Flask(__name__)
 app.secret_key = "chave-secreta-para-sessao"  # Muda para algo mais seguro em produção
-CORS(app)  # Permite o acesso entre frontend e backend durante o desenvolvimento
+app.permanent_session_lifetime = timedelta(minutes=30)
+CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5000"}}, supports_credentials=True)
  
 # -----------------------------
 # Função: Conexão com a Base de Dados
@@ -33,6 +36,7 @@ def connect_to_database():
 def login_required(func):
     @wraps(func)  # Preserva o nome e documentação original da função decorada
     def wrapper(*args, **kwargs):
+        print(f"### Sessão ativa: {session.get('user_id')} ###") 
         if 'user_id' not in session:  # Verifica se há um `user_id` na sessão
             return jsonify({"error": "Autenticação necessária!"}), 401
         return func(*args, **kwargs)  # Executa a função original se o utilizador estiver autenticado
@@ -41,13 +45,11 @@ def login_required(func):
 
 # Endpoint para login
 @app.route('/login', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def login():
     data = request.json
     email = data.get("email")
     password = data.get("password")
- 
-    if not email or not password:
-        return jsonify({"error": "Email e password são obrigatórios!"}), 400
  
     connection = connect_to_database()
     if not connection:
@@ -55,18 +57,14 @@ def login():
  
     try:
         with connection.cursor() as cursor:
-            query = "SELECT user_id, password_hash FROM users WHERE email = %s"
-            cursor.execute(query, (email,))
+            cursor.execute("SELECT user_id, password_hash FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
- 
             if user and check_password_hash(user[1], password):
-                session['user_id'] = user[0]
+                session['user_id'] = user[0]  # Guarda a sessão
+                print(f"### Sessão Criada: user_id={session['user_id']} ###")  # Log claro da sessão
                 return jsonify({"message": "Login bem-sucedido!"}), 200
             else:
                 return jsonify({"error": "Email ou password inválidos!"}), 401
-    except Exception as e:
-        print(f"Erro ao processar login: {e}")
-        return jsonify({"error": "Erro interno do servidor."}), 500
     finally:
         connection.close()
  
@@ -75,6 +73,7 @@ def login():
 # -----------------------------
 
 @app.route('/logout', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def logout():
     session.clear()  # Remove todas as informações da sessão
     return jsonify({"message": "Logout realizado com sucesso!"}), 200
@@ -83,6 +82,7 @@ def logout():
 # Endpoint: Criar Utilizador
 # -----------------------------
 @app.route('/users', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def add_user():
     print("### Pedido recebido no endpoint /users [POST] ###")
     data = request.json
@@ -130,6 +130,7 @@ def add_user():
 # Endpoint: Listar Utilizadores
 # -----------------------------
 @app.route('/users', methods=['GET'])
+@cross_origin(supports_credentials=True)
 def get_users():
     print("### Pedido recebido no endpoint /users [GET] ###")
     connection = connect_to_database()
@@ -150,142 +151,129 @@ def get_users():
         connection.close()
         print("### Ligação à base de dados encerrada. ###")
  
-# -----------------------------
-# Endpoint: Criar Conta
-# -----------------------------
-
-
-@app.route('/accounts', methods=['GET', 'POST'])
-@login_required
-def manage_accounts():
-    if request.method == 'GET':
-        print("### Pedido recebido no endpoint /accounts [GET] ###")
-        connection = connect_to_database()
-        if not connection:
-            return jsonify({"error": "Erro ao conectar à base de dados."}), 500
- 
-        try:
-            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM accounts;")
-                accounts = cursor.fetchall()
-                print("### Dados retornados da base de dados:", accounts)
-                return jsonify(accounts)  # Retorna as contas no formato JSON
-        except Exception as e:
-            print(f"### Erro ao buscar contas: {e} ###")
-            return jsonify({"error": "Erro ao buscar contas."}), 500
-        finally:
-            connection.close()
-            print("### Ligação à base de dados encerrada. ###")
- 
-    elif request.method == 'POST':
-        print("### Pedido recebido no endpoint /accounts [POST] ###")
-        data = request.json
-        print("### Dados recebidos:", data)
- 
-        if not data:
-            return jsonify({"error": "Corpo da requisição está vazio!"}), 400
- 
-        user_id = data.get("user_id")
-        initial_balance = data.get("initial_balance")
- 
-        if not all([user_id, initial_balance]):
-            return jsonify({"error": "Todos os campos são obrigatórios!"}), 400
- 
-        connection = connect_to_database()
-        if not connection:
-            return jsonify({"error": "Erro ao conectar à base de dados."}), 500
- 
-        try:
-            with connection.cursor() as cursor:
-                query = """
-                INSERT INTO accounts (user_id, balance)
-                VALUES (%s, %s);
-                """
-                cursor.execute(query, (user_id, initial_balance))
-                connection.commit()
-                print(f"### Conta criada com sucesso para o utilizador {user_id}. ###")
-                return jsonify({"message": "Conta criada com sucesso!"}), 201
-        except Exception as e:
-            print(f"### Erro ao criar conta: {e} ###")
-            return jsonify({"error": "Erro ao criar conta."}), 500
-        finally:
-            connection.close()
-            print("### Ligação à base de dados encerrada. ###")
  
 # -----------------------------
 # Endpoint: Realizar Transferência
 # -----------------------------
 @app.route('/transactions', methods=['GET', 'POST'])
+@cross_origin(supports_credentials=True)
 @login_required
 def manage_transactions():
+    # Obter o ID do utilizador autenticado
+    user_id = session['user_id']
+
+ 
+    # Método GET: Obter o histórico de transações do utilizador logado
     if request.method == 'GET':
-        print("### Pedido recebido no endpoint /transactions [GET] ###")
         connection = connect_to_database()
         if not connection:
             return jsonify({"error": "Erro ao conectar à base de dados."}), 500
  
         try:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM transactions;")
+                query = """
+                SELECT transaction_id, to_iban, amount, transaction_date 
+                FROM transactions 
+                WHERE user_id = %s 
+                ORDER BY transaction_date DESC;
+                """
+                cursor.execute(query, (user_id,))
                 transactions = cursor.fetchall()
-                print("### Dados retornados da base de dados:", transactions)
-                return jsonify(transactions)  # Retorna as transações no formato JSON
+                return jsonify(transactions), 200
         except Exception as e:
-            print(f"### Erro ao buscar transações: {e} ###")
+            print(f"Erro ao buscar transações: {e}")
             return jsonify({"error": "Erro ao buscar transações."}), 500
         finally:
             connection.close()
-            print("### Ligação à base de dados encerrada. ###")
  
+    # Método POST: Realizar uma nova transferência
     elif request.method == 'POST':
-        print("### Pedido recebido no endpoint /transactions [POST] ###")
-        data = request.json
-        print("### Dados recebidos:", data)
+        # Garantir que o corpo da requisição é JSON
+        if not request.is_json:
+            return jsonify({"error": "Requisição deve conter JSON válido."}), 415
  
-        if not data:
-            return jsonify({"error": "Corpo da requisição está vazio!"}), 400
- 
-        from_account = data.get("from_account")
-        to_account = data.get("to_account")
+        # Obter dados da requisição
+        data = request.get_json()
+        to_iban = data.get("to_iban")
         amount = data.get("amount")
  
-        if not all([from_account, to_account, amount]):
+        # Validar os campos obrigatórios
+        if not all([to_iban, amount]):
             return jsonify({"error": "Todos os campos são obrigatórios!"}), 400
  
+        # Conectar à base de dados
         connection = connect_to_database()
         if not connection:
             return jsonify({"error": "Erro ao conectar à base de dados."}), 500
  
         try:
             with connection.cursor() as cursor:
-                # Verifica saldo da conta de origem
-                cursor.execute("SELECT balance FROM accounts WHERE account_id = %s;", (from_account,))
-                result = cursor.fetchone()
-                if not result or result[0] < amount:
-                    print("### Erro: Saldo insuficiente ou conta inexistente. ###")
-                    return jsonify({"error": "Saldo insuficiente ou conta inexistente."}), 400
+                # Verificar o saldo do utilizador logado
+                cursor.execute("SELECT balance FROM users WHERE user_id = %s;", (user_id,))
+                user_balance = cursor.fetchone()
  
-                # Deduz saldo da conta de origem
-                cursor.execute("UPDATE accounts SET balance = balance - %s WHERE account_id = %s;", (amount, from_account))
+                if not user_balance or user_balance[0] < float(amount):
+                    return jsonify({"error": "Saldo insuficiente."}), 400
  
-                # Adiciona saldo à conta de destino
-                cursor.execute("UPDATE accounts SET balance = balance + %s WHERE account_id = %s;", (amount, to_account))
+                # Atualizar saldo do utilizador logado
+                cursor.execute("UPDATE users SET balance = balance - %s WHERE user_id = %s;", (amount, user_id))
  
-                # Regista a transação
-                query = """
-                INSERT INTO transactions (from_account, to_account, amount)
-                VALUES (%s, %s, %s);
-                """
-                cursor.execute(query, (from_account, to_account, amount))
+                # Registar a transação
+                cursor.execute("""
+                    INSERT INTO transactions (user_id, to_iban, amount) 
+                    VALUES (%s, %s, %s);
+                """, (user_id, to_iban, amount))
+ 
+                # Commit para salvar as alterações
                 connection.commit()
-                print(f"### Transferência de {amount} realizada com sucesso de {from_account} para {to_account}. ###")
+ 
+                print(f"### Transferência de {amount} realizada com sucesso para IBAN {to_iban}. ###")
                 return jsonify({"message": "Transferência realizada com sucesso!"}), 201
+ 
         except Exception as e:
+            # Em caso de erro, desfaz as alterações
+            connection.rollback()
             print(f"### Erro ao realizar transação: {e} ###")
             return jsonify({"error": "Erro ao realizar transação."}), 500
+ 
         finally:
+            # Fechar a conexão com a base de dados
             connection.close()
-            print("### Ligação à base de dados encerrada. ###")
+
+
+
+@app.route('/deposits', methods=['POST'])
+@cross_origin(supports_credentials=True)
+@login_required
+def deposit():
+    data = request.get_json()
+    amount = data.get("amount")
+    user_id = session['user_id']
+ 
+    if not amount or float(amount) <= 0:
+        return jsonify({"error": "O montante do depósito deve ser maior que zero."}), 400
+ 
+    connection = connect_to_database()
+    if not connection:
+        return jsonify({"error": "Erro ao conectar à base de dados."}), 500
+ 
+    try:
+        with connection.cursor() as cursor:
+            # Atualizar saldo do utilizador
+            cursor.execute("UPDATE users SET balance = balance + %s WHERE user_id = %s;", (amount, user_id))
+            # Registar transação
+            cursor.execute("""
+                INSERT INTO transactions (user_id, to_iban, amount)
+                VALUES (%s, %s, %s);
+            """, (user_id, 'Depósito', amount))
+            connection.commit()
+            return jsonify({"message": "Depósito realizado com sucesso!"}), 201
+    except Exception as e:
+        connection.rollback()
+        print(f"Erro ao processar depósito: {e}")
+        return jsonify({"error": "Erro ao processar depósito."}), 500
+    finally:
+        connection.close()
 
 
  
