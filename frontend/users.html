@@ -105,36 +105,50 @@
 </div>
 <script>
         document.getElementById("createUserForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
  
-            const userData = {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value,
-                nif: document.getElementById("nif").value,
-                birth_date: document.getElementById("birth_date").value,
-                address: document.getElementById("address").value,
-                phone: document.getElementById("phone").value,
-            };
  
-            try {
-                const response = await fetch("http://127.0.0.1:5000/users", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(userData),
-                });
+    const formData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        nif: document.getElementById("nif").value,
+        birth_date: document.getElementById("birth_date").value,
+        address: document.getElementById("address").value,
+        phone: document.getElementById("phone").value,
+    };
  
-                if (response.ok) {
-                    alert("Registo bem-sucedido!");
-                    window.location.href = "dashboard.html"; // Redireciona para a dashboard
-                } else {
-                    document.getElementById("errorMessage").style.display = "block";
-                }
-            } catch (error) {
-                console.error("Erro ao registar:", error);
-                document.getElementById("errorMessage").style.display = "block";
-            }
+    try {
+        const response = await fetch("http://127.0.0.1:5000/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json",
+                 "Authorization": `Bearer ${token}`
+             },
+            body: JSON.stringify(formData),
         });
+ 
+        const result = await response.json();
+        console.log(result)
+ 
+        if (response.ok) {
+            alert(result.message);
+            localStorage.setItem("token", result.token); // Guarda o token JWT
+            window.location.href = "dashboard.html"; // Redireciona para a dashboard
+        } else {
+            alert(result.error || "Erro ao criar utilizador.");
+        }
+        console.log(token)
+    } catch (error) {
+        console.error("Erro ao criar utilizador:", error);
+        alert("Erro ao comunicar com o servidor.");
+    }
+});
 </script>
 </body>
 </html>

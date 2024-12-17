@@ -6,14 +6,13 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     try {
         const response = await fetch("http://127.0.0.1:5000/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
         });
  
         if (response.ok) {
+            const result = await response.json();
+            localStorage.setItem("token", result.token);  // Guarda o token
             alert("Login bem-sucedido!");
             window.location.href = "dashboard.html"; // Redireciona para a dashboard
         } else {
@@ -23,5 +22,4 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         console.error("Erro ao fazer login:", error);
         document.getElementById("errorMessage").style.display = "block";
     }
-
 });
