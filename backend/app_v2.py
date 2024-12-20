@@ -43,25 +43,29 @@ def add_user():
     birth_date = data.get("birth_date")
     address = data.get("address")
     phone = data.get("phone")
- 
     if not all([name, email, password, nif, birth_date, address, phone]):
         return jsonify({"error": "Todos os campos são obrigatórios!"}), 400
- 
     password_hash = generate_password_hash(password)
- 
     connection = connect_to_database()
     if not connection:
         return jsonify({"error": "Erro ao conectar à base de dados."}), 500
- 
     try:
         with connection.cursor() as cursor:
+            # Inserção do utilizador na base de dados
             query = """
             INSERT INTO users (name, email, password_hash, nif, birth_date, address, phone, balance)
             VALUES (%s, %s, %s, %s, %s, %s, %s, 0);
             """
             cursor.execute(query, (name, email, password_hash, nif, birth_date, address, phone))
             connection.commit()
-            return jsonify({"message": f"Utilizador {name} criado com sucesso!"}), 201
+            # Obtenção do ID do utilizador recém-criado
+            user_id = cursor.lastrowid
+            # Criação do token JWT
+            access_token = create_access_token(identity=str(user_id))
+            return jsonify({
+                "message": f"Utilizador {name} criado com sucesso!",
+                "token": access_token
+            }), 201
     except Exception as e:
         print(f"Erro ao criar utilizador: {e}")
         return jsonify({"error": "Erro ao criar utilizador."}), 500
